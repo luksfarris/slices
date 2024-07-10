@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "slices"
+version = "1.0.0"
+description = ""
+authors = ["Lucas Farris <lucas@farris.com.br>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.10"
+pandas = "^2.2.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.7.1"
+pytest = "^8.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+sample_sum = "slices.sample_math:run"

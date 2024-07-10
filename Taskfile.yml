@@ -1,0 +1,53 @@
+version: "3"
+
+includes:
+  build: ./Taskfile_{{OS}}.yml
+
+env:
+  VENV_FOLDER: venv
+  PYTHON_VERSION: 3.9
+  CONTAINER_ENGINE: podman
+
+tasks:
+
+  local_setup:
+    desc: Sets up the project locally
+    cmds:
+      - task: setup
+      - task: install
+      - task: lint
+
+  setup:
+    desc: Sets up the virtual environment and builds the dependencies
+    cmds:
+      - python${PYTHON_VERSION} -m venv ${VENV_FOLDER}
+      - ${VENV_FOLDER}/${EXEC_FOLDER}/pip install -r build_requirements.txt
+  
+  install:
+    desc: Installs the dependencies using poetry
+    cmds:
+      - ${VENV_FOLDER}/${EXEC_FOLDER}/poetry install --all-extras
+      - ${VENV_FOLDER}/${EXEC_FOLDER}/poetry run pre-commit install
+
+  install_container:
+    desc: Installs the dependencies specifically using requirements.txt
+    cmds:
+      - ${VENV_FOLDER}/${EXEC_FOLDER}/poetry export --with dev --without-hashes --all-extras -f requirements.txt -o requirements.txt
+      - ${VENV_FOLDER}/${EXEC_FOLDER}/pip install --no-cache-dir --no-deps -r requirements.txt
+      - rm requirements.txt
+
+  lint:
+    desc: Runs the linters
+    cmds:
+      - ${VENV_FOLDER}/${EXEC_FOLDER}/pre-commit run --all-files
+  
+  test:
+    desc: Runs the unit tests
+    cmds:
+      - ${VENV_FOLDER}/${EXEC_FOLDER}/pytest unit_tests
+  
+  container_build:
+    desc: Builds the container and runs the tests
+    cmds:
+      - ${CONTAINER_ENGINE} build -t slices --file docker/Dockerfile .
+      - ${CONTAINER_ENGINE} run -it slices:latest test
