@@ -8,7 +8,7 @@ FROM task AS venv
 WORKDIR /app
 COPY build_requirements.txt build_requirements.txt
 COPY Taskfile.yml Taskfile.yml
-COPY Taskfile_linux.yml Taskfile_linux.yml
+COPY taskfiles taskfiles
 RUN task setup
 # Stage 3: install dependencies
 FROM venv as dependencies
